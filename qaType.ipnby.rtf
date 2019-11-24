@@ -1,0 +1,485 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf600
+{\fonttbl\f0\fmodern\fcharset0 Courier;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\sl280\partightenfactor0
+
+\f0\fs24 \cf2 \expnd0\expndtw0\kerning0
+\{\
+ "cells": [\
+  \{\
+   "cell_type": "code",\
+   "execution_count": 165,\
+   "metadata": \{\
+    "collapsed": true\
+   \},\
+   "outputs": [],\
+   "source": [\
+    "import pandas as pd\\n",\
+    "import numpy as np\\n",\
+    "import re\\n",\
+    "import nltk"\
+   ]\
+  \},\
+  \{\
+   "cell_type": "code",\
+   "execution_count": 166,\
+   "metadata": \{\},\
+   "outputs": [\
+    \{\
+     "name": "stderr",\
+     "output_type": "stream",\
+     "text": [\
+      "/Users/Swayam/anaconda2/lib/python2.7/site-packages/ipykernel_launcher.py:1: ParserWarning: Falling back to the 'python' engine because the 'c' engine does not support regex separators (separators > 1 char and different from '\\\\s+' are interpreted as regex); you can avoid this warning by specifying engine='python'.\\n",\
+      "  \\"\\"\\"Entry point for launching an IPython kernel.\\n"\
+     ]\
+    \}\
+   ],\
+   "source": [\
+    "df = pd.read_csv(\\"/Users/Swayam/Downloads/LabelledData (1).txt\\",sep=\\",,,\\",header=None ,names=['question','label'])"\
+   ]\
+  \},\
+  \{\
+   "cell_type": "code",\
+   "execution_count": 167,\
+   "metadata": \{\},\
+   "outputs": [\
+    \{\
+     "data": \{\
+      "text/html": [\
+       "<div>\\n",\
+       "<style>\\n",\
+       "    .dataframe thead tr:only-child th \{\\n",\
+       "        text-align: right;\\n",\
+       "    \}\\n",\
+       "\\n",\
+       "    .dataframe thead th \{\\n",\
+       "        text-align: left;\\n",\
+       "    \}\\n",\
+       "\\n",\
+       "    .dataframe tbody tr th \{\\n",\
+       "        vertical-align: top;\\n",\
+       "    \}\\n",\
+       "</style>\\n",\
+       "<table border=\\"1\\" class=\\"dataframe\\">\\n",\
+       "  <thead>\\n",\
+       "    <tr style=\\"text-align: right;\\">\\n",\
+       "      <th></th>\\n",\
+       "      <th>question</th>\\n",\
+       "      <th>label</th>\\n",\
+       "    </tr>\\n",\
+       "  </thead>\\n",\
+       "  <tbody>\\n",\
+       "    <tr>\\n",\
+       "      <th>0</th>\\n",\
+       "      <td>how did serfdom develop in and then leave russ...</td>\\n",\
+       "      <td>unknown</td>\\n",\
+       "    </tr>\\n",\
+       "    <tr>\\n",\
+       "      <th>1</th>\\n",\
+       "      <td>what films featured the character popeye doyle ?</td>\\n",\
+       "      <td>what</td>\\n",\
+       "    </tr>\\n",\
+       "    <tr>\\n",\
+       "      <th>2</th>\\n",\
+       "      <td>how can i find a list of celebrities ' real na...</td>\\n",\
+       "      <td>unknown</td>\\n",\
+       "    </tr>\\n",\
+       "    <tr>\\n",\
+       "      <th>3</th>\\n",\
+       "      <td>what fowl grabs the spotlight after the chines...</td>\\n",\
+       "      <td>what</td>\\n",\
+       "    </tr>\\n",\
+       "    <tr>\\n",\
+       "      <th>4</th>\\n",\
+       "      <td>what is the full form of .com ?</td>\\n",\
+       "      <td>what</td>\\n",\
+       "    </tr>\\n",\
+       "  </tbody>\\n",\
+       "</table>\\n",\
+       "</div>"\
+      ],\
+      "text/plain": [\
+       "                                            question     label\\n",\
+       "0  how did serfdom develop in and then leave russ...   unknown\\n",\
+       "1  what films featured the character popeye doyle ?       what\\n",\
+       "2  how can i find a list of celebrities ' real na...   unknown\\n",\
+       "3  what fowl grabs the spotlight after the chines...      what\\n",\
+       "4                   what is the full form of .com ?       what"\
+      ]\
+     \},\
+     "execution_count": 167,\
+     "metadata": \{\},\
+     "output_type": "execute_result"\
+    \}\
+   ],\
+   "source": [\
+    "df.head()"\
+   ]\
+  \},\
+  \{\
+   "cell_type": "code",\
+   "execution_count": 168,\
+   "metadata": \{\},\
+   "outputs": [\
+    \{\
+     "data": \{\
+      "text/plain": [\
+       "(1483, 2)"\
+      ]\
+     \},\
+     "execution_count": 168,\
+     "metadata": \{\},\
+     "output_type": "execute_result"\
+    \}\
+   ],\
+   "source": [\
+    "df.shape"\
+   ]\
+  \},\
+  \{\
+   "cell_type": "code",\
+   "execution_count": 169,\
+   "metadata": \{\},\
+   "outputs": [\
+    \{\
+     "data": \{\
+      "text/plain": [\
+       "\{'  what', '  who', ' affirmation', ' unknown', ' what', ' when', ' who'\}"\
+      ]\
+     \},\
+     "execution_count": 169,\
+     "metadata": \{\},\
+     "output_type": "execute_result"\
+    \}\
+   ],\
+   "source": [\
+    "set(df['label'])"\
+   ]\
+  \},\
+  \{\
+   "cell_type": "code",\
+   "execution_count": 170,\
+   "metadata": \{\
+    "collapsed": true\
+   \},\
+   "outputs": [],\
+   "source": [\
+    "df['label']=df['label'].str.strip()"\
+   ]\
+  \},\
+  \{\
+   "cell_type": "code",\
+   "execution_count": 171,\
+   "metadata": \{\},\
+   "outputs": [\
+    \{\
+     "data": \{\
+      "text/plain": [\
+       "\{'affirmation', 'unknown', 'what', 'when', 'who'\}"\
+      ]\
+     \},\
+     "execution_count": 171,\
+     "metadata": \{\},\
+     "output_type": "execute_result"\
+    \}\
+   ],\
+   "source": [\
+    "set(df['label'])"\
+   ]\
+  \},\
+  \{\
+   "cell_type": "code",\
+   "execution_count": 172,\
+   "metadata": \{\},\
+   "outputs": [\
+    \{\
+     "data": \{\
+      "text/plain": [\
+       "0    how did serfdom develop in and then leave russ...\\n",\
+       "1    what films featured the character popeye doyle ? \\n",\
+       "2    how can i find a list of celebrities ' real na...\\n",\
+       "3    what fowl grabs the spotlight after the chines...\\n",\
+       "4                     what is the full form of .com ? \\n",\
+       "Name: question, dtype: object"\
+      ]\
+     \},\
+     "execution_count": 172,\
+     "metadata": \{\},\
+     "output_type": "execute_result"\
+    \}\
+   ],\
+   "source": [\
+    "df['question'].head()"\
+   ]\
+  \},\
+  \{\
+   "cell_type": "code",\
+   "execution_count": 173,\
+   "metadata": \{\
+    "collapsed": true\
+   \},\
+   "outputs": [],\
+   "source": [\
+    "df['question'] = df['question'].apply(lambda x: x.lower())\\n",\
+    "df['question'] = df['question'].apply((lambda x: re.sub('[^a-zA-z0-9\\\\s]','',x)))"\
+   ]\
+  \},\
+  \{\
+   "cell_type": "code",\
+   "execution_count": 174,\
+   "metadata": \{\},\
+   "outputs": [\
+    \{\
+     "data": \{\
+      "text/plain": [\
+       "0    how did serfdom develop in and then leave russ...\\n",\
+       "1     what films featured the character popeye doyle  \\n",\
+       "2    how can i find a list of celebrities  real nam...\\n",\
+       "3    what fowl grabs the spotlight after the chines...\\n",\
+       "4                       what is the full form of com  \\n",\
+       "Name: question, dtype: object"\
+      ]\
+     \},\
+     "execution_count": 174,\
+     "metadata": \{\},\
+     "output_type": "execute_result"\
+    \}\
+   ],\
+   "source": [\
+    "df['question'].head()"\
+   ]\
+  \},\
+  \{\
+   "cell_type": "code",\
+   "execution_count": 175,\
+   "metadata": \{\},\
+   "outputs": [\
+    \{\
+     "data": \{\
+      "text/plain": [\
+       "'how did serfdom develop in and then leave russia'"\
+      ]\
+     \},\
+     "execution_count": 175,\
+     "metadata": \{\},\
+     "output_type": "execute_result"\
+    \}\
+   ],\
+   "source": [\
+    "((df['question'].iloc[0].strip()))"\
+   ]\
+  \},\
+  \{\
+   "cell_type": "code",\
+   "execution_count": 176,\
+   "metadata": \{\},\
+   "outputs": [\
+    \{\
+     "name": "stdout",\
+     "output_type": "stream",\
+     "text": [\
+      "what           609\\n",\
+      "who            402\\n",\
+      "unknown        272\\n",\
+      "affirmation    104\\n",\
+      "when            96\\n",\
+      "Name: label, dtype: int64\\n"\
+     ]\
+    \}\
+   ],\
+   "source": [\
+    "print(df['label'].value_counts())"\
+   ]\
+  \},\
+  \{\
+   "cell_type": "code",\
+   "execution_count": 177,\
+   "metadata": \{\
+    "collapsed": true\
+   \},\
+   "outputs": [],\
+   "source": [\
+    "from sklearn.feature_extraction.text import CountVectorizer\\n",\
+    "from sklearn.naive_bayes import MultinomialNB\\n",\
+    "from sklearn.metrics import classification_report\\n",\
+    "from sklearn.metrics import confusion_matrix\\n",\
+    "import pickle as pkl\\n",\
+    "from nltk.stem import SnowballStemmer\\n",\
+    "from nltk import word_tokenize"\
+   ]\
+  \},\
+  \{\
+   "cell_type": "code",\
+   "execution_count": 178,\
+   "metadata": \{\
+    "collapsed": true\
+   \},\
+   "outputs": [],\
+   "source": [\
+    "stemmer = SnowballStemmer('english').stem\\n",\
+    "def stem_tokenize(text):\\n",\
+    "    return [stemmer(i) for i in word_tokenize(text)]"\
+   ]\
+  \},\
+  \{\
+   "cell_type": "code",\
+   "execution_count": 179,\
+   "metadata": \{\
+    "collapsed": true\
+   \},\
+   "outputs": [],\
+   "source": [\
+    "vectorizer = CountVectorizer(analyzer='word',lowercase=True,tokenizer=stem_tokenize)\\n",\
+    "X_train = vectorizer.fit_transform(df['question'].values)"\
+   ]\
+  \},\
+  \{\
+   "cell_type": "code",\
+   "execution_count": 180,\
+   "metadata": \{\
+    "collapsed": true\
+   \},\
+   "outputs": [],\
+   "source": [\
+    "labels = df['label']"\
+   ]\
+  \},\
+  \{\
+   "cell_type": "code",\
+   "execution_count": 181,\
+   "metadata": \{\},\
+   "outputs": [],\
+   "source": [\
+    "TEST_SPLIT=0.33\\n",\
+    "\\n",\
+    "# split the data into a training set and a test set\\n",\
+    "indices = np.arange(X_train.shape[0])\\n",\
+    "np.random.shuffle(indices)\\n",\
+    "X_train = X_train[indices]\\n",\
+    "labels = labels[indices]\\n",\
+    "test_samples = int(TEST_SPLIT * X_train.shape[0])\\n",\
+    "\\n",\
+    "x_train = X_train[:-test_samples]\\n",\
+    "y_train = labels[:-test_samples]\\n",\
+    "x_test = X_train[-test_samples:]\\n",\
+    "y_test = labels[-test_samples:]"\
+   ]\
+  \},\
+  \{\
+   "cell_type": "code",\
+   "execution_count": 182,\
+   "metadata": \{\},\
+   "outputs": [\
+    \{\
+     "data": \{\
+      "text/plain": [\
+       "MultinomialNB(alpha=1.0, class_prior=None, fit_prior=True)"\
+      ]\
+     \},\
+     "execution_count": 182,\
+     "metadata": \{\},\
+     "output_type": "execute_result"\
+    \}\
+   ],\
+   "source": [\
+    "# train model\\n",\
+    "clf = MultinomialNB(alpha=1.0)\\n",\
+    "clf.fit(x_train,y_train)"\
+   ]\
+  \},\
+  \{\
+   "cell_type": "code",\
+   "execution_count": 183,\
+   "metadata": \{\},\
+   "outputs": [\
+    \{\
+     "name": "stdout",\
+     "output_type": "stream",\
+     "text": [\
+      "             precision    recall  f1-score   support\\n",\
+      "\\n",\
+      "affirmation       0.58      1.00      0.73        18\\n",\
+      "    unknown       0.79      0.88      0.83        82\\n",\
+      "       what       0.99      0.86      0.92       237\\n",\
+      "       when       0.42      0.88      0.57        17\\n",\
+      "        who       0.99      0.91      0.95       135\\n",\
+      "\\n",\
+      "avg / total       0.92      0.88      0.89       489\\n",\
+      "\\n",\
+      "Accuracy : 0.883435582822\\n"\
+     ]\
+    \}\
+   ],\
+   "source": [\
+    "# evaluate the model on test data\\n",\
+    "pred = clf.predict(x_test)\\n",\
+    "print(classification_report(pred,y_test))\\n",\
+    "print(\\"Accuracy : \{\}\\".format(clf.score(x_test,y_test)))"\
+   ]\
+  \},\
+  \{\
+   "cell_type": "code",\
+   "execution_count": 184,\
+   "metadata": \{\
+    "collapsed": true\
+   \},\
+   "outputs": [],\
+   "source": [\
+    "# predict new data \\n",\
+    "dat=vectorizer.transform([\\"what is the time\\"])\\n",\
+    "yy = clf.predict(dat)"\
+   ]\
+  \},\
+  \{\
+   "cell_type": "code",\
+   "execution_count": 185,\
+   "metadata": \{\},\
+   "outputs": [\
+    \{\
+     "name": "stdout",\
+     "output_type": "stream",\
+     "text": [\
+      "Question-Type: what\\n"\
+     ]\
+    \}\
+   ],\
+   "source": [\
+    "print('Question-Type: \{\}'.format(yy[0]))"\
+   ]\
+  \},\
+  \{\
+   "cell_type": "code",\
+   "execution_count": null,\
+   "metadata": \{\
+    "collapsed": true\
+   \},\
+   "outputs": [],\
+   "source": []\
+  \}\
+ ],\
+ "metadata": \{\
+  "kernelspec": \{\
+   "display_name": "Python 2",\
+   "language": "python",\
+   "name": "python2"\
+  \},\
+  "language_info": \{\
+   "codemirror_mode": \{\
+    "name": "ipython",\
+    "version": 2\
+   \},\
+   "file_extension": ".py",\
+   "mimetype": "text/x-python",\
+   "name": "python",\
+   "nbconvert_exporter": "python",\
+   "pygments_lexer": "ipython2",\
+   "version": "2.7.14"\
+  \}\
+ \},\
+ "nbformat": 4,\
+ "nbformat_minor": 2\
+\}\
+}
